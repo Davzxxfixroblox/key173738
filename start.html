@@ -18,35 +18,31 @@
         // === CONFIGURAÇÃO ===
         const HASH_CORRETO = "#verificado";
         
-        // AQUI ESTÁ A CORREÇÃO: O LINK COMPLETO DO SEU SITE
+        // CORREÇÃO: Vamos redirecionar para a raiz (o final é apenas a barra /)
+        // Isso obriga o GitHub a entregar o index.html automaticamente
         const BASE_URL = "https://davzxxfixroblox.github.io/key173738/";
         // ====================
 
         function validar() {
-            // 1. Verifica se tem a senha do encurtador
             if (window.location.hash !== HASH_CORRETO) {
                 document.getElementById("msg").className = "erro";
                 document.getElementById("msg").innerHTML = "⛔ ACESSO NEGADO ⛔<br>Use o link do Script.";
                 return;
             }
 
-            // 2. Limpa URL para evitar favoritos
             if (window.history.replaceState) {
                 window.history.replaceState(null, document.title, "/redirecionando");
             }
 
-            // 3. Calcula a Key
             const d = new Date();
             const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
             
-            // 4. MONTA O LINK COMPLETO (Correção do erro)
-            const destinoFinal = BASE_URL + "index.html?validacao=" + code;
+            // MUDANÇA AQUI: Tiramos o "index.html" e deixamos só o parâmetro
+            const destinoFinal = BASE_URL + "?validacao=" + code;
 
-            // Mostra na tela para debug (se travar, você vê o link)
             document.getElementById("msg").innerText = "Redirecionando...";
             document.getElementById("debug").innerText = "Indo para: " + destinoFinal;
 
-            // Redireciona
             setTimeout(() => {
                 window.location.href = destinoFinal;
             }, 1000);
