@@ -2,65 +2,53 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Carregando...</title>
+    <title>Verificando...</title>
     <style>
-        body { 
-            background-color: #000; 
-            color: #ff3333; 
-            font-family: monospace; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            text-align: center;
-        }
-        .loading { color: #00ff88; }
+        body { background-color: #000; color: red; font-family: monospace; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100vh; margin: 0; }
     </style>
 </head>
 <body>
-    <h2 id="msg" class="loading">Validando acesso...</h2>
-    
+    <h2 id="status">Aguarde...</h2>
     <script>
-        // ==========================================
-        // CONFIGURAÇÃO DE SEGURANÇA
-        // ==========================================
-        // O link no EncurtaNet DEVE ter isso no final: ?auth=verificado
-        const REQUIRED_TOKEN = "verificado"; 
-        // ==========================================
+        // === CONFIGURAÇÃO ===
+        const REQUIRED_AUTH = "verificado"; 
+        // =====================
 
-        function processRedirect() {
+        function go() {
+            // 1. Verifica parâmetro da URL (?auth=verificado)
             const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('auth');
-
-            // 1. VERIFICA SE O LINK TEM A SENHA DO ENCURTANET
-            if (token !== REQUIRED_TOKEN) {
-                document.getElementById("msg").innerText = "⛔ ACESSO DIRETO BLOQUEADO ⛔";
-                document.body.innerHTML += "<p>Você tentou pular o encurtador ou usou um link salvo.</p>";
-                document.body.innerHTML += "<p style='color:white'>Volte ao script e clique em 'PEGAR KEY' novamente.</p>";
-                return; // Para tudo aqui
+            if (urlParams.get('auth') !== REQUIRED_AUTH) {
+                fail("LINK INCORRETO. Use o encurtador.");
+                return;
             }
 
-            // 2. O TRUQUE: LIMPA A URL DO NAVEGADOR PARA EVITAR FAVORITOS
-            // Se o cara tentar salvar agora, vai salvar um link que não funciona
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, "/bloqueado");
-            }
-
-            // 3. CALCULA A KEY (Igual ao Index)
+            // 2. TENTATIVA DE DETECTAR ACESSO DIRETO (FAVORITOS)
+            // Se document.referrer for vazio, geralmente é acesso direto/favorito
+            // OBS: Alguns navegadores escondem isso, então não podemos bloquear 100%,
+            // mas podemos assustar.
+            
+            // Lógica Matemática do Dia
             const d = new Date();
             const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
-            const destination = "index.html?validacao=" + code;
+            
+            // O TRUQUE VISUAL:
+            // Substitui a URL atual por uma falsa antes de redirecionar
+            window.history.replaceState({}, document.title, "/bloqueado_por_seguranca");
 
-            // 4. REDIRECIONA
-            document.getElementById("msg").innerText = "Gerando Key...";
+            document.getElementById("status").style.color = "#00ff88";
+            document.getElementById("status").innerText = "Validando...";
+
+            // Redireciona para o index com a senha do dia
             setTimeout(() => {
-                window.location.replace(destination);
-            }, 500); // Pequeno delay para garantir a limpeza da URL
+                window.location.replace("index.html?validacao=" + code);
+            }, 800);
         }
 
-        processRedirect();
+        function fail(msg) {
+            document.getElementById("status").innerText = "⛔ " + msg;
+        }
+
+        go();
     </script>
 </body>
 </html>
