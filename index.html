@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Davzx Security</title>
+    <title>Davzx Hub - Security</title>
     <style>
         body {
-            background-color: #0d0d0d;
+            background-color: #0f0f12;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -18,99 +18,113 @@
             text-align: center;
         }
         .container {
-            display: none; /* ESCONDIDO POR PADRÃO */
-            background-color: #1a1a1a;
-            padding: 40px;
-            border-radius: 15px;
-            border: 2px solid #00ff88;
-            box-shadow: 0 0 40px rgba(0, 255, 136, 0.2);
-            max-width: 400px;
-            width: 90%;
+            display: none; /* Começa escondido até verificar */
+            background-color: #1a1a1e;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #00aaff;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.15);
+            max-width: 90%;
+            width: 350px;
         }
         .error-screen {
-            display: none; /* TELA DE ERRO */
-            color: #ff4444;
+            display: none; /* Começa escondido */
+            max-width: 90%;
+            background-color: #2a1515;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ff4444;
         }
-        h1 { margin-bottom: 10px; }
+        h1 { margin: 0 0 10px 0; font-size: 24px; color: #fff; }
+        p { color: #aaa; font-size: 14px; margin-bottom: 20px; }
+        
         .key-box {
             background-color: #000;
-            padding: 20px;
-            font-size: 24px;
+            padding: 15px;
+            font-size: 22px;
             font-weight: bold;
-            border: 1px dashed #555;
-            color: #00ff88;
-            margin: 20px 0;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px dashed #444;
+            color: #00aaff;
+            letter-spacing: 1px;
+            word-break: break-all;
             user-select: all;
         }
+        
         button {
-            padding: 15px;
+            padding: 12px;
             width: 100%;
-            background-color: #00ff88;
+            background-color: #00aaff;
             border: none;
+            color: white;
+            border-radius: 6px;
             font-weight: bold;
             font-size: 16px;
             cursor: pointer;
-            border-radius: 5px;
+            transition: 0.2s;
         }
+        button:active { transform: scale(0.98); }
+        
+        /* Estilo do Erro */
+        .error-icon { font-size: 50px; margin-bottom: 10px; display: block; }
+        .error-title { color: #ff4444; font-weight: bold; font-size: 20px; }
     </style>
 </head>
 <body>
 
-    <!-- TELA DE SUCESSO (SÓ APARECE COM O LINK CERTO) -->
-    <div id="app" class="container">
+    <!-- TELA DE SUCESSO (KEY) -->
+    <div id="successScreen" class="container">
         <h1>DAVZX HUB</h1>
-        <p>Key gerada com sucesso para hoje:</p>
-        <div id="keyDisplay" class="key-box">...</div>
+        <p>Acesso validado para hoje!</p>
+        
+        <div id="keyDisplay" class="key-box">CARREGANDO...</div>
+        
         <button onclick="copyKey()" id="btnCopy">COPIAR KEY</button>
-        <p style="font-size: 11px; color: gray; margin-top: 15px;">A key muda sozinha à meia-noite (UTC).</p>
+        <p style="font-size: 11px; margin-top: 15px; color: #555;">Expira à meia-noite (UTC).</p>
     </div>
 
-    <!-- TELA DE ERRO (APARECE SE ENTRAR DIRETO) -->
-    <div id="error" class="error-screen">
-        <h1>⛔ ACESSO NEGADO</h1>
-        <p>Você não pode acessar este site diretamente.</p>
-        <p>Passe pelo Linkvertise no Script para liberar o acesso.</p>
+    <!-- TELA DE ERRO (BLOQUEIO) -->
+    <div id="errorScreen" class="error-screen">
+        <span class="error-icon">⛔</span>
+        <div class="error-title">LINK EXPIRADO</div>
+        <p>Você tentou usar um link salvo nos favoritos ou antigo.</p>
+        <p style="color: #fff;">Por favor, volte ao Script no Roblox e clique em <b>"PEGAR KEY"</b> novamente para gerar o acesso de hoje.</p>
     </div>
 
     <script>
-        // === CONFIGURAÇÃO DE SEGURANÇA ===
-        // O usuário precisa ter isso no final do link para entrar
-        const PASS_TOKEN = "acesso=permitido"; 
+        function checkSecurity() {
+            // 1. Calcula a matemática do dia HOJE (UTC)
+            const d = new Date();
+            // A MESMA CONTA DO ARQUIVO START.HTML
+            const todayCode = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
 
-        function checkAccess() {
-            // Verifica se o link atual tem "?acesso=permitido"
+            // 2. Pega o código que veio no link (?validacao=...)
             const urlParams = new URLSearchParams(window.location.search);
-            const access = urlParams.get('acesso');
+            const token = urlParams.get('validacao');
 
-            if (access === "permitido") {
-                // Se tiver a senha no link, mostra o gerador
-                document.getElementById("app").style.display = "block";
-                generateKey();
+            // 3. Verifica se o código do link é igual ao código de hoje
+            if (token == todayCode) {
+                // SUCESSO: Mostra a tela da key
+                document.getElementById("successScreen").style.display = "block";
+                document.getElementById("keyDisplay").innerText = "DAVZX-" + todayCode;
             } else {
-                // Se não tiver, mostra erro
-                document.getElementById("error").style.display = "block";
+                // ERRO: O código é velho ou não existe
+                document.getElementById("errorScreen").style.display = "block";
             }
-        }
-
-        function generateKey() {
-            const date = new Date();
-            const day = date.getUTCDate();
-            const month = date.getUTCMonth() + 1; 
-            const year = date.getUTCFullYear();
-
-            // MATEMÁTICA
-            const code = (day * 1024) + (month * 512) + year;
-            document.getElementById("keyDisplay").innerText = "DAVZX-" + code;
         }
 
         function copyKey() {
             const keyText = document.getElementById("keyDisplay").innerText;
             navigator.clipboard.writeText(keyText);
-            document.getElementById("btnCopy").innerText = "COPIADO!";
+            const btn = document.getElementById("btnCopy");
+            btn.innerText = "COPIADO!";
+            btn.style.backgroundColor = "#00ff88";
+            btn.style.color = "black";
         }
 
-        // Inicia a verificação ao carregar a página
-        checkAccess();
+        // Roda a verificação assim que entra
+        checkSecurity();
     </script>
 
 </body>
