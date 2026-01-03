@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Key Davzx</title>
+    <style>
+        body {
+            background-color: #121214;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #202024;
+            padding: 50px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #333;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.15);
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 { color: #00aaff; margin-bottom: 5px; font-size: 28px; }
+        p { color: #aaa; margin-bottom: 25px; }
+        
+        .key-box {
+            background-color: #121214;
+            padding: 20px;
+            font-size: 26px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 2px dashed #00aaff;
+            letter-spacing: 2px;
+            color: #ffffff;
+            user-select: all; /* Facilita a seleção */
+        }
+        
+        button {
+            padding: 15px 30px;
+            background-color: #00aaff;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.3s;
+            width: 100%;
+        }
+        button:hover { 
+            background-color: #0088cc; 
+            transform: scale(1.02);
+        }
+        .footer { font-size: 11px; color: #555; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>DAVZX HUB</h1>
+        <p>Gere sua chave de acesso diária abaixo:</p>
+        
+        <div id="keyDisplay" class="key-box">CARREGANDO...</div>
+        
+        <button onclick="copyKey()" id="btnCopy">COPIAR KEY</button>
+        
+        <div class="footer">
+            A key expira automaticamente à meia-noite (Horário UTC).<br>
+            Não é necessário passar pelo encurtador novamente hoje.
+        </div>
+    </div>
+
+    <script>
+        function generateKey() {
+            // Pega a data UTC (A mesma lógica do seu script Lua)
+            const date = new Date();
+            const day = date.getUTCDate();
+            const month = date.getUTCMonth() + 1; 
+            const year = date.getUTCFullYear();
+
+            // MATEMÁTICA (Deve ser IGUAL à do Script Lua)
+            const code = (day * 1024) + (month * 512) + year;
+            const finalKey = "DAVZX-" + code;
+
+            document.getElementById("keyDisplay").innerText = finalKey;
+        }
+
+        function copyKey() {
+            const keyText = document.getElementById("keyDisplay").innerText;
+            navigator.clipboard.writeText(keyText);
+            
+            const btn = document.getElementById("btnCopy");
+            btn.innerText = "COPIADO!";
+            btn.style.backgroundColor = "#00ff7f";
+            btn.style.color = "black";
+            
+            setTimeout(() => {
+                btn.innerText = "COPIAR KEY";
+                btn.style.backgroundColor = "#00aaff";
+                btn.style.color = "white";
+            }, 2000);
+        }
+
+        generateKey();
+    </script>
+
+</body>
+</html>
