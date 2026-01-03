@@ -4,22 +4,63 @@
     <meta charset="UTF-8">
     <title>Carregando...</title>
     <style>
-        body { background-color: #000; color: #00ff88; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        body { 
+            background-color: #000; 
+            color: #ff3333; 
+            font-family: monospace; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            text-align: center;
+        }
+        .loading { color: #00ff88; }
     </style>
 </head>
 <body>
-    <h2>Gerando link seguro...</h2>
+    <h2 id="msg" class="loading">Validando acesso...</h2>
+    
     <script>
-        // 1. Calcula a matemática do dia (Igual ao Script Lua)
-        const d = new Date();
-        const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
+        // ==========================================
+        // CONFIGURAÇÃO DE SEGURANÇA
+        // ==========================================
+        // O link no EncurtaNet DEVE ter isso no final: ?auth=verificado
+        const REQUIRED_TOKEN = "verificado"; 
+        // ==========================================
 
-        // 2. Monta o link para o seu arquivo index.html com o código
-        // O GitHub automaticamente serve o index.html na raiz, então só precisamos passar o parâmetro
-        const destination = "https://davzxxfixroblox.github.io/key173738/?validacao=" + code;
+        function processRedirect() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('auth');
 
-        // 3. Redireciona o usuário
-        window.location.href = destination;
+            // 1. VERIFICA SE O LINK TEM A SENHA DO ENCURTANET
+            if (token !== REQUIRED_TOKEN) {
+                document.getElementById("msg").innerText = "⛔ ACESSO DIRETO BLOQUEADO ⛔";
+                document.body.innerHTML += "<p>Você tentou pular o encurtador ou usou um link salvo.</p>";
+                document.body.innerHTML += "<p style='color:white'>Volte ao script e clique em 'PEGAR KEY' novamente.</p>";
+                return; // Para tudo aqui
+            }
+
+            // 2. O TRUQUE: LIMPA A URL DO NAVEGADOR PARA EVITAR FAVORITOS
+            // Se o cara tentar salvar agora, vai salvar um link que não funciona
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, "/bloqueado");
+            }
+
+            // 3. CALCULA A KEY (Igual ao Index)
+            const d = new Date();
+            const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
+            const destination = "index.html?validacao=" + code;
+
+            // 4. REDIRECIONA
+            document.getElementById("msg").innerText = "Gerando Key...";
+            setTimeout(() => {
+                window.location.replace(destination);
+            }, 500); // Pequeno delay para garantir a limpeza da URL
+        }
+
+        processRedirect();
     </script>
 </body>
 </html>
