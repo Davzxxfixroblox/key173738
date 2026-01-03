@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Carregando...</title>
+    <style>
+        body { background-color: #000; color: #00ff88; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    </style>
+</head>
+<body>
+    <h2>Gerando link seguro...</h2>
+    <script>
+        // 1. Calcula a matemática do dia (Igual ao Script Lua)
+        const d = new Date();
+        const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
+
+        // 2. Monta o link para o seu arquivo index.html com o código
+        // O GitHub automaticamente serve o index.html na raiz, então só precisamos passar o parâmetro
+        const destination = "https://davzxxfixroblox.github.io/key173738/?validacao=" + code;
+
+        // 3. Redireciona o usuário
+        window.location.href = destination;
+    </script>
+</body>
+</html>
