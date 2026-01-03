@@ -2,49 +2,60 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Debug Davzx</title>
+    <title>Processando...</title>
     <style>
-        body { background-color: #000; color: white; font-family: monospace; padding: 20px; text-align: center; }
-        .box { border: 1px solid white; padding: 10px; margin: 10px; word-break: break-all; }
-        .certo { color: #00ff00; }
-        .errado { color: #ff0000; }
+        body { background-color: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: monospace; text-align: center; }
+        h2 { color: #00ff88; }
+        .erro { color: red; }
     </style>
 </head>
 <body>
-    <h2>MODO DE DIAGNÓSTICO</h2>
-    
-    <p>O link que chegou aqui foi:</p>
-    <div class="box" id="urlDisplay">...</div>
-
-    <p>O Status da verificação é:</p>
-    <h3 id="status">...</h3>
+    <h2 id="msg">Verificando origem...</h2>
 
     <script>
-        // Mostra a URL completa que o navegador recebeu
-        document.getElementById("urlDisplay").innerText = window.location.href;
+        // === CONFIGURAÇÃO ===
+        const HASH_CORRETO = "#verificado";
+        // ====================
 
-        // Tenta pegar o token
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('auth');
+        function validar() {
+            // 1. VERIFICAÇÃO DO HASH (A SENHA DO ENCURTANET)
+            if (window.location.hash !== HASH_CORRETO) {
+                bloquear("ACESSO DIRETO NEGADO.<br>O link não possui a autenticação do encurtador.");
+                return;
+            }
 
-        const SENHA_CORRETA = "verificado";
+            // 2. PROTEÇÃO CONTRA FAVORITOS (LIMPEZA DE URL)
+            // Isso remove o "#verificado" da barra de endereços IMEDIATAMENTE.
+            // Se o usuário tentar salvar nos favoritos agora, ele salva um link quebrado.
+            if (window.history.replaceState) {
+                window.history.replaceState(null, document.title, "/protegido_contra_copia");
+            }
 
-        if (token === SENHA_CORRETA) {
-            document.getElementById("status").innerText = "✅ SUCESSO! A SENHA CHEGOU.";
-            document.getElementById("status").className = "certo";
+            // 3. SE PASSOU, CALCULA A DATA E REDIRECIONA
+            liberarAcesso();
+        }
+
+        function liberarAcesso() {
+            document.getElementById("msg").innerText = "Autenticado! Gerando Key...";
             
-            // Se deu certo, redireciona em 3 segundos para testar
+            // Matemática da Key (Igual ao Index e ao Lua)
             const d = new Date();
             const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
+            
+            // Redireciona em 1 segundo (tempo suficiente para a URL limpar)
             setTimeout(() => {
-                window.location.href = "index.html?validacao=" + code;
-            }, 3000);
-
-        } else {
-            document.getElementById("status").innerText = "❌ ERRO! A URL NÃO TEM '?auth=verificado'";
-            document.getElementById("status").className = "errado";
-            document.body.innerHTML += "<p>Vá no EncurtaNet e verifique o link de destino.</p>";
+                window.location.replace("index.html?validacao=" + code);
+            }, 800);
         }
+
+        function bloquear(motivo) {
+            document.getElementById("msg").className = "erro";
+            document.getElementById("msg").innerHTML = "⛔ BLOQUEADO ⛔<br><br>" + motivo;
+            document.body.innerHTML += "<br><br><p>Volte ao script e pegue o link novamente.</p>";
+        }
+
+        // Inicia a validação
+        validar();
     </script>
 </body>
 </html>
