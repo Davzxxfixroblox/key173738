@@ -2,59 +2,56 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Processando...</title>
+    <title>Redirecionando...</title>
     <style>
-        body { background-color: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: monospace; text-align: center; }
+        body { background-color: black; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: monospace; text-align: center; }
         h2 { color: #00ff88; }
         .erro { color: red; }
+        .link-box { font-size: 10px; color: gray; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h2 id="msg">Verificando origem...</h2>
+    <h2 id="msg">Verificando...</h2>
+    <div id="debug" class="link-box"></div>
 
     <script>
         // === CONFIGURAÇÃO ===
         const HASH_CORRETO = "#verificado";
+        
+        // AQUI ESTÁ A CORREÇÃO: O LINK COMPLETO DO SEU SITE
+        const BASE_URL = "https://davzxxfixroblox.github.io/key173738/";
         // ====================
 
         function validar() {
-            // 1. VERIFICAÇÃO DO HASH (A SENHA DO ENCURTANET)
+            // 1. Verifica se tem a senha do encurtador
             if (window.location.hash !== HASH_CORRETO) {
-                bloquear("ACESSO DIRETO NEGADO.<br>O link não possui a autenticação do encurtador.");
+                document.getElementById("msg").className = "erro";
+                document.getElementById("msg").innerHTML = "⛔ ACESSO NEGADO ⛔<br>Use o link do Script.";
                 return;
             }
 
-            // 2. PROTEÇÃO CONTRA FAVORITOS (LIMPEZA DE URL)
-            // Isso remove o "#verificado" da barra de endereços IMEDIATAMENTE.
-            // Se o usuário tentar salvar nos favoritos agora, ele salva um link quebrado.
+            // 2. Limpa URL para evitar favoritos
             if (window.history.replaceState) {
-                window.history.replaceState(null, document.title, "/protegido_contra_copia");
+                window.history.replaceState(null, document.title, "/redirecionando");
             }
 
-            // 3. SE PASSOU, CALCULA A DATA E REDIRECIONA
-            liberarAcesso();
-        }
-
-        function liberarAcesso() {
-            document.getElementById("msg").innerText = "Autenticado! Gerando Key...";
-            
-            // Matemática da Key (Igual ao Index e ao Lua)
+            // 3. Calcula a Key
             const d = new Date();
             const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
             
-            // Redireciona em 1 segundo (tempo suficiente para a URL limpar)
+            // 4. MONTA O LINK COMPLETO (Correção do erro)
+            const destinoFinal = BASE_URL + "index.html?validacao=" + code;
+
+            // Mostra na tela para debug (se travar, você vê o link)
+            document.getElementById("msg").innerText = "Redirecionando...";
+            document.getElementById("debug").innerText = "Indo para: " + destinoFinal;
+
+            // Redireciona
             setTimeout(() => {
-                window.location.replace("index.html?validacao=" + code);
-            }, 800);
+                window.location.href = destinoFinal;
+            }, 1000);
         }
 
-        function bloquear(motivo) {
-            document.getElementById("msg").className = "erro";
-            document.getElementById("msg").innerHTML = "⛔ BLOQUEADO ⛔<br><br>" + motivo;
-            document.body.innerHTML += "<br><br><p>Volte ao script e pegue o link novamente.</p>";
-        }
-
-        // Inicia a validação
         validar();
     </script>
 </body>
