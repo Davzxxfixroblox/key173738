@@ -2,48 +2,186 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Redirecionando...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proteção Davzx</title>
     <style>
-        body { background-color: black; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; font-family: monospace; text-align: center; }
-        h2 { color: #00ff88; }
-        .erro { color: red; }
-        .link-box { font-size: 10px; color: gray; margin-top: 20px; }
+        body {
+            background-color: #050505;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        /* Container Principal */
+        .card {
+            background-color: #121214;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+            max-width: 320px;
+            width: 90%;
+        }
+
+        h2 { color: #00ff88; margin-top: 0; font-size: 20px; }
+        p { font-size: 13px; color: #888; margin-bottom: 20px; }
+
+        /* O Visual do Captcha */
+        .captcha-display {
+            background: #222;
+            background-image: linear-gradient(45deg, #222 25%, #2a2a2a 25%, #2a2a2a 50%, #222 50%, #222 75%, #2a2a2a 75%, #2a2a2a 100%);
+            background-size: 20px 20px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            user-select: none; /* Impede copiar o texto */
+            text-decoration: line-through; /* Risco no meio para dificultar leitura de bots */
+            border: 1px solid #444;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #000;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            margin-bottom: 15px;
+            box-sizing: border-box; /* Garante que padding não quebre o layout */
+        }
+        input:focus { border-color: #00ff88; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #00ff88;
+            border: none;
+            border-radius: 5px;
+            color: #000;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #00cc6a; }
+
+        .erro-msg { color: #ff4444; font-size: 12px; margin-top: 10px; display: none; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <h2 id="msg">Verificando...</h2>
-    <div id="debug" class="link-box"></div>
+
+    <!-- TELA DE CAPTCHA -->
+    <div id="captchaScreen" class="card">
+        <h2>VERIFICAÇÃO DE SEGURANÇA</h2>
+        <p>Digite os caracteres abaixo para continuar:</p>
+        
+        <div id="captchaText" class="captcha-display">...</div>
+        
+        <input type="text" id="userInput" placeholder="Digite aqui" maxlength="6">
+        
+        <button onclick="verificarCaptcha()">VERIFICAR</button>
+        
+        <div id="erroMsg" class="erro-msg">Código incorreto! Tente novamente.</div>
+    </div>
+
+    <!-- TELA DE CARREGAMENTO (SÓ APARECE DEPOIS DE PASSAR) -->
+    <div id="loadingScreen" class="hidden">
+        <h2 style="color: #00ff88;">ACERTOU!</h2>
+        <p>Redirecionando para a Key...</p>
+    </div>
+
+    <!-- TELA DE BLOQUEIO (LINK ERRADO) -->
+    <div id="blockScreen" class="hidden">
+        <h2 style="color: #ff4444;">ACESSO NEGADO</h2>
+        <p>Link inválido. Use o encurtador.</p>
+    </div>
 
     <script>
+        // === CONFIGURAÇÕES ===
         const HASH_CORRETO = "#verificado";
+        const BASE_URL = "https://davzxxfixroblox.github.io/key173738/";
         
-        const BASE_URL = "https://davzxxfixroblox.github.io/key173738/"
+        let codigoAtual = "";
 
-        function validar() {
+        // 1. INICIALIZAÇÃO
+        function init() {
+            // Verifica se o link tem a senha do encurtador
             if (window.location.hash !== HASH_CORRETO) {
-                document.getElementById("msg").className = "erro";
-                document.getElementById("msg").innerHTML = "⛔ ACESSO NEGADO ⛔<br>Use o link do Script.";
+                document.getElementById("captchaScreen").style.display = "none";
+                document.getElementById("blockScreen").style.display = "block";
                 return;
             }
+            // Se tiver certo, gera o captcha
+            gerarNovoCaptcha();
+        }
 
+        // 2. GERADOR DE CÓDIGO ALEATÓRIO
+        function gerarNovoCaptcha() {
+            const caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Sem I, 1, 0, O para não confundir
+            let resultado = "";
+            for (let i = 0; i < 5; i++) {
+                resultado += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            codigoAtual = resultado;
+            document.getElementById("captchaText").innerText = resultado;
+        }
+
+        // 3. VERIFICAÇÃO
+        function verificarCaptcha() {
+            const input = document.getElementById("userInput").value.toUpperCase().trim();
+            const msgErro = document.getElementById("erroMsg");
+
+            if (input === codigoAtual) {
+                // ACERTOU!
+                sucesso();
+            } else {
+                // ERROU!
+                msgErro.style.display = "block";
+                document.getElementById("userInput").value = "";
+                document.getElementById("userInput").focus();
+                gerarNovoCaptcha(); // Muda o código para evitar spam
+            }
+        }
+
+        // 4. SUCESSO E REDIRECIONAMENTO
+        function sucesso() {
+            // Troca a tela
+            document.getElementById("captchaScreen").style.display = "none";
+            document.getElementById("loadingScreen").style.display = "block";
+
+            // Limpa o histórico (Segurança Anti-Favoritos)
             if (window.history.replaceState) {
-                window.history.replaceState(null, document.title, "/redirecionando");
+                window.history.replaceState(null, document.title, "/verificado_com_sucesso");
             }
 
+            // Calcula a Key do Dia e Redireciona
             const d = new Date();
             const code = (d.getUTCDate() * 1024) + ((d.getUTCMonth() + 1) * 512) + d.getUTCFullYear();
             
-            const destinoFinal = BASE_URL + "?validacao=" + code;
-
-            document.getElementById("msg").innerText = "Redirecionando...";
-            document.getElementById("debug").innerText = "Indo para: " + destinoFinal;
-
             setTimeout(() => {
-                window.location.href = destinoFinal;
+                // Manda para o Index com a validação matemática
+                window.location.replace(BASE_URL + "?validacao=" + code);
             }, 1000);
         }
 
-        validar();
+        // Inicia tudo
+        init();
     </script>
+
 </body>
 </html>
