@@ -4,71 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Davzx Hub - Security</title>
+    <!-- Fonte Moderna do Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary-color: #00aaff;
+            --primary-glow: rgba(0, 170, 255, 0.4);
+            --bg-dark: #09090b;
+            --card-bg: rgba(20, 20, 25, 0.7);
+            --error-color: #ff4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+
         body {
-            background-color: #0f0f12;
+            background-color: var(--bg-dark);
+            /* Fundo sutil com gradiente radial */
+            background-image: radial-gradient(circle at center, #1b2028 0%, #050505 100%);
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             margin: 0;
-            text-align: center;
+            overflow: hidden;
         }
+
+        /* Animação de entrada suave */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .container {
-            display: none; /* Começa escondido até verificar */
-            background-color: #1a1a1e;
+            display: none; /* JS controla isso */
+            background: var(--card-bg);
+            backdrop-filter: blur(15px); /* Efeito de vidro */
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+            width: 380px;
+            text-align: center;
+            animation: fadeUp 0.6s ease-out forwards;
+        }
+
+        .error-screen {
+            display: none; /* JS controla isso */
+            background: rgba(30, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
             padding: 30px;
-            border-radius: 12px;
-            border: 2px solid #00aaff;
-            box-shadow: 0 0 30px rgba(0, 170, 255, 0.15);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.15);
             max-width: 90%;
             width: 350px;
+            text-align: center;
+            animation: fadeUp 0.6s ease-out forwards;
         }
-        .error-screen {
-            display: none; /* Começa escondido */
-            max-width: 90%;
-            background-color: #2a1515;
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid #ff4444;
+
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 28px;
+            font-weight: 800;
+            /* Texto com gradiente */
+            background: linear-gradient(135deg, #fff 30%, var(--primary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
         }
-        h1 { margin: 0 0 10px 0; font-size: 24px; color: #fff; }
-        p { color: #aaa; font-size: 14px; margin-bottom: 20px; }
+
+        p {
+            color: #a0a0b0;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
         
         .key-box {
-            background-color: #000;
-            padding: 15px;
-            font-size: 22px;
-            font-weight: bold;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px dashed #444;
-            color: #00aaff;
+            background-color: #050507;
+            padding: 18px;
+            font-family: 'JetBrains Mono', monospace; /* Fonte de código */
+            font-size: 20px;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+            color: var(--primary-color);
             letter-spacing: 1px;
             word-break: break-all;
             user-select: all;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        /* Efeito de brilho na Key */
+        .key-box::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 8px;
+            box-shadow: 0 0 15px var(--primary-glow);
+            opacity: 0.5;
+            pointer-events: none;
         }
         
         button {
-            padding: 12px;
+            padding: 14px;
             width: 100%;
-            background-color: #00aaff;
+            /* Gradiente no botão */
+            background: linear-gradient(135deg, #0088cc 0%, #00aaff 100%);
             border: none;
             color: white;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 170, 255, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        button:active { transform: scale(0.98); }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 170, 255, 0.4);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
         
-        /* Estilo do Erro */
-        .error-icon { font-size: 50px; margin-bottom: 10px; display: block; }
-        .error-title { color: #ff4444; font-weight: bold; font-size: 20px; }
+        /* Estilos específicos da tela de erro */
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        .error-title {
+            color: var(--error-color);
+            font-weight: 700;
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .error-text {
+            color: #ddd;
+            font-size: 13px;
+        }
+        .footer-text {
+            font-size: 11px;
+            margin-top: 20px;
+            color: #555;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -76,20 +176,23 @@
     <!-- TELA DE SUCESSO (KEY) -->
     <div id="successScreen" class="container">
         <h1>DAVZX HUB</h1>
-        <p>Acesso validado para hoje!</p>
+        <p>Acesso validado com sucesso!</p>
         
         <div id="keyDisplay" class="key-box">CARREGANDO...</div>
         
-        <button onclick="copyKey()" id="btnCopy">COPIAR KEY</button>
-        <p style="font-size: 11px; margin-top: 15px; color: #555;">Expira à meia-noite (UTC).</p>
+        <button onclick="copyKey()" id="btnCopy">Copiar Key</button>
+        <p class="footer-text">A key expira automaticamente à meia-noite (UTC).</p>
     </div>
 
     <!-- TELA DE ERRO (BLOQUEIO) -->
     <div id="errorScreen" class="error-screen">
         <span class="error-icon">⛔</span>
-        <div class="error-title">LINK EXPIRADO</div>
-        <p>Você tentou usar um link salvo ou antigo.</p>
-        <p style="color: #fff;">Por favor, volte ao Script no Roblox e clique em <b>"PEGAR KEY"</b> novamente para gerar o acesso de hoje.</p>
+        <div class="error-title">Link Expirado</div>
+        <p class="error-text">Este link de validação não é mais válido ou é antigo.</p>
+        <p class="error-text" style="color: #fff; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;">
+            Volte ao script no Roblox e clique em <br>
+            <b style="color: var(--primary-color);">"PEGAR KEY"</b>
+        </p>
     </div>
 
     <script>
@@ -118,9 +221,19 @@
             const keyText = document.getElementById("keyDisplay").innerText;
             navigator.clipboard.writeText(keyText);
             const btn = document.getElementById("btnCopy");
+            
+            // Feedback visual no botão
+            const originalText = btn.innerText;
             btn.innerText = "COPIADO!";
-            btn.style.backgroundColor = "#00ff88";
-            btn.style.color = "black";
+            btn.style.background = "linear-gradient(135deg, #00b09b, #96c93d)"; // Verde sucesso
+            btn.style.boxShadow = "0 4px 15px rgba(0, 255, 136, 0.3)";
+            
+            // Retorna ao normal após 2 segundos (opcional, mas legal para UX)
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "linear-gradient(135deg, #0088cc 0%, #00aaff 100%)";
+                btn.style.boxShadow = "0 4px 15px rgba(0, 170, 255, 0.25)";
+            }, 3000);
         }
 
         // Roda a verificação assim que entra
